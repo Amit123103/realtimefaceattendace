@@ -1,0 +1,16 @@
+# Render Deployment Configuration
+# https://render.com
+
+# Build Command:
+pip install -r backend/requirements.txt
+
+# Start Command:
+cd backend && gunicorn app:app --bind 0.0.0.0:$PORT
+
+# Environment Variables to Set:
+# MAIL_SERVER=smtp.gmail.com
+# MAIL_PORT=587
+# MAIL_USE_TLS=True
+# MAIL_USERNAME=your-email@gmail.com
+# MAIL_PASSWORD=your-app-password
+# MAIL_DEFAULT_SENDER=noreply@attendance.com

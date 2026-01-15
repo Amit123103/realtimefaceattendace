@@ -23,7 +23,21 @@ from support_handler import SupportHandler
 from health import register_health_routes
 
 app = Flask(__name__)
-CORS(app)
+
+# CORS Configuration - Allow frontend from GitHub Pages and localhost
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "https://amit123103.github.io",
+            "http://localhost:*",
+            "http://127.0.0.1:*",
+            "*"  # Allow all origins for development
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 # Configuration
 UPLOAD_FOLDER = Path('../uploads')

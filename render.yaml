@@ -1,16 +1,19 @@
-# Render Deployment Configuration
-# https://render.com
-
-# Build Command:
-pip install -r backend/requirements.txt
-
-# Start Command:
-cd backend && gunicorn app:app --bind 0.0.0.0:$PORT
-
-# Environment Variables to Set:
-# MAIL_SERVER=smtp.gmail.com
-# MAIL_PORT=587
-# MAIL_USE_TLS=True
-# MAIL_USERNAME=your-email@gmail.com
-# MAIL_PASSWORD=your-app-password
-# MAIL_DEFAULT_SENDER=noreply@attendance.com
+services:
+  - type: web
+    name: face-attendance-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: True
+      - key: FLASK_ENV
+        value: production

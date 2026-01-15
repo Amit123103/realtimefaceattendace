@@ -20,6 +20,7 @@ from email_service import EmailService
 from analytics import AnalyticsEngine
 from multi_admin import MultiAdminHandler
 from support_handler import SupportHandler
+from health import register_health_routes
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +46,9 @@ email_service = EmailService(app)
 analytics_engine = AnalyticsEngine(excel_handler)
 multi_admin = MultiAdminHandler()
 support_handler = SupportHandler()
+
+# Register health check routes
+register_health_routes(app)
 
 # Helper functions
 def decode_base64_image(base64_string):

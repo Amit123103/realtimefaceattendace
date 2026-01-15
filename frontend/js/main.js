@@ -1,6 +1,10 @@
 // Main JavaScript for Student Interface
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// API_BASE_URL is now loaded from js/config.js
+
+// Valid Tabs
+let currentAttTab = 'face';
+let html5QrcodeScanner = null;
 
 // Show/Hide Modals
 function showRegisterForm() {
@@ -12,7 +16,9 @@ function showRegisterForm() {
 function showAttendanceForm() {
     const modal = document.getElementById('attendance-modal');
     modal.classList.add('active');
-    resetCameraUI('attendance');
+
+    // Default to face tab
+    switchAttendanceTab('face');
 }
 
 function closeModal(modalId) {
@@ -27,8 +33,112 @@ function closeModal(modalId) {
     } else if (modalId === 'attendance-modal') {
         stopCamera('attendance');
         resetCameraUI('attendance');
+
+        // Stop QR Scanner
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }
     }
 }
+
+// Switch Attendance Tab
+function switchAttendanceTab(tab) {
+    currentAttTab = tab;
+
+    // Update buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    // Simple logic assuming order: 0 is face, 1 is qr. 
+    // Better to use ID or event target, but for now:
+    if (tab === 'face') buttons[0].classList.add('active');
+    else buttons[1].classList.add('active');
+
+    // Toggle content
+    document.getElementById('att-face-tab').style.display = tab === 'face' ? 'block' : 'none';
+    document.getElementById('att-qr-tab').style.display = tab === 'qr' ? 'block' : 'none';
+
+    // Handle camera states
+    if (tab === 'face') {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }
+        resetCameraUI('attendance');
+    } else {
+        stopCamera('attendance');
+    }
+}
+
+// QR Scanner Logic
+function initQRScanner() {
+    if (html5QrcodeScanner) return; // Already running
+
+    html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        /* verbose= */ false
+    );
+
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+    // Hide the start button
+    event.target.style.display = 'none';
+}
+
+async function onScanSuccess(decodedText, decodedResult) {
+    // Handle the scanned code
+    console.log(`Code matched = ${decodedText}`, decodedResult);
+
+    // Stop scanning
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+        html5QrcodeScanner = null;
+        document.getElementById('qr-reader').innerHTML = ""; // Clear div
+    }
+
+    document.getElementById('qr-result').innerText = "Processing: " + decodedText; // Show feedback
+
+    // Call backend
+    try {
+        const response = await fetch(`${API_BASE_URL}/mark-attendance-qr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ qr_data: decodedText })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            enhancedModal.showSuccess(
+                '✓ Attendance Marked (QR)!',
+                `Welcome ${data.data.name}! Your attendance has been recorded via QR Code.`,
+                {
+                    'Name': data.data.name,
+                    'Registration No': data.data.registration_no,
+                    'Time': data.data.time,
+                    'Mode': 'QR Scan'
+                }
+            );
+            closeModal('attendance-modal');
+        } else {
+            enhancedModal.showError(
+                '✗ QR Not Recognized',
+                data.message || 'Invalid QR Code',
+                { 'Scanned Data': decodedText }
+            );
+        }
+    } catch (error) {
+        console.error("QR Error", error);
+        enhancedModal.showError('Connection Error', 'Could not verify QR code.');
+    }
+}
+
+function onScanFailure(error) {
+    // handle scan failure, usually better to ignore and keep scanning.
+    // console.warn(`Code scan error = ${error}`);
+}
+
 
 // Close modal on outside click
 document.addEventListener('click', (e) => {
@@ -112,7 +222,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     }
 });
 
-// Scan Attendance
+// Scan Attendance (Face) - Improved
 async function scanAttendance() {
     const image = getCapturedImage('attendance');
 
@@ -161,10 +271,10 @@ async function scanAttendance() {
             // ERROR: Face not matched!
             enhancedModal.showError(
                 '✗ Face Not Recognized',
-                data.message || 'Your face was not recognized in our system. Please register first or try again.',
+                data.message || 'Your face was not recognized. Please scan slowly or try QR Code.',
                 {
                     'Status': 'Not Matched',
-                    'Action': 'Please register or try scanning again'
+                    'Action': 'Try Again or Use QR Tab'
                 }
             );
             // Allow retake
@@ -200,5 +310,5 @@ function showNotification(message, type = 'success') {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Face Recognition Attendance System Loaded');
-    console.log('API Base URL:', API_BASE_URL);
+    console.log('API Base URL:', typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'Unknown');
 });

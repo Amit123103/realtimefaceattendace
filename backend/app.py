@@ -167,6 +167,9 @@ def register_student():
                 'message': 'Error saving image'
             }), 500
         
+        # Train model with new image
+        face_engine.train_model()
+        
         # Add to Excel
         success, message = excel_handler.add_student(name, registration_no, image_path)
         
@@ -262,6 +265,70 @@ def mark_attendance():
     
     except Exception as e:
         print(f"Error in mark_attendance: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Server error: {str(e)}'
+        }), 500
+
+# Mark Attendance with QR Code
+@app.route('/api/mark-attendance-qr', methods=['POST'])
+def mark_attendance_qr():
+    """Mark attendance using QR code"""
+    try:
+        data = request.json
+        qr_data = data.get('qr_data')
+        
+        if not qr_data:
+            return jsonify({
+                'success': False,
+                'message': 'No QR data provided'
+            }), 400
+            
+        # Verify QR
+        valid, result = qr_handler.verify_qr_data(qr_data)
+        if not valid:
+            return jsonify({
+                'success': False,
+                'message': result
+            }), 400
+            
+        registration_no = result
+        
+        # Get student details
+        student = excel_handler.get_student_by_regno(registration_no)
+        if not student:
+            return jsonify({
+                'success': False,
+                'message': 'Student not found in database'
+            }), 404
+            
+        # Record attendance
+        # We don't have an image for QR scan, so we pass a placeholder path
+        success, message = excel_handler.add_attendance(
+            student['Name'],
+            registration_no,
+            "QR_In_Person"
+        )
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Attendance marked successfully via QR!',
+                'data': {
+                    'name': student['Name'],
+                    'registration_no': registration_no,
+                    'mode': 'QR Code',
+                    'time': datetime.now().strftime('%H:%M:%S')
+                }
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': message
+            }), 400
+            
+    except Exception as e:
+        print(f"Error in mark_attendance_qr: {e}")
         return jsonify({
             'success': False,
             'message': f'Server error: {str(e)}'

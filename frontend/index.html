@@ -13,6 +13,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 
 <body>
@@ -174,41 +175,69 @@
                 <button class="close-btn" onclick="closeModal('attendance-modal')">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="attendance-container">
-                    <p class="attendance-instruction">Position your face in the camera and click "Scan Face"</p>
-                    <div class="camera-container">
-                        <video id="attendance-video" autoplay playsinline></video>
-                        <canvas id="attendance-canvas" style="display: none;"></canvas>
-                        <div id="attendance-preview" class="preview-container" style="display: none;">
-                            <img id="attendance-preview-img" alt="Captured face">
+                <!-- Tabs -->
+                <div class="login-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="tab-btn active" onclick="switchAttendanceTab('face')"
+                        style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; cursor: pointer;">Face
+                        Scan</button>
+                    <button class="tab-btn" onclick="switchAttendanceTab('qr')"
+                        style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; cursor: pointer;">QR
+                        Scan</button>
+                </div>
+
+                <!-- Face Tab -->
+                <div id="att-face-tab" class="att-tab-content active">
+                    <div class="attendance-container">
+                        <p class="attendance-instruction">Position your face in the camera and click "Scan Face"</p>
+                        <div class="camera-container">
+                            <video id="attendance-video" autoplay playsinline></video>
+                            <canvas id="attendance-canvas" style="display: none;"></canvas>
+                            <div id="attendance-preview" class="preview-container" style="display: none;">
+                                <img id="attendance-preview-img" alt="Captured face">
+                            </div>
+                        </div>
+                        <div class="camera-controls">
+                            <button type="button" class="btn btn-outline" id="start-attendance-camera"
+                                onclick="startCamera('attendance')">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
+                                        fill="currentColor" />
+                                    <path
+                                        d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
+                                        fill="currentColor" />
+                                </svg>
+                                Start Camera
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="scan-attendance-btn"
+                                onclick="scanAttendance()" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
+                                        fill="currentColor" />
+                                </svg>
+                                <span class="btn-text">Scan Face</span>
+                                <span class="btn-loader" style="display: none;">
+                                    <svg class="spinner" viewBox="0 0 50 50">
+                                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5">
+                                        </circle>
+                                    </svg>
+                                </span>
+                            </button>
                         </div>
                     </div>
-                    <div class="camera-controls">
-                        <button type="button" class="btn btn-outline" id="start-attendance-camera"
-                            onclick="startCamera('attendance')">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
-                                    fill="currentColor" />
-                                <path
-                                    d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
-                                    fill="currentColor" />
-                            </svg>
-                            Start Camera
-                        </button>
-                        <button type="button" class="btn btn-secondary" id="scan-attendance-btn"
-                            onclick="scanAttendance()" style="display: none;">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
-                                    fill="currentColor" />
-                            </svg>
-                            <span class="btn-text">Scan Face</span>
-                            <span class="btn-loader" style="display: none;">
-                                <svg class="spinner" viewBox="0 0 50 50">
-                                    <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-                                </svg>
-                            </span>
+                </div>
+
+                <!-- QR Tab -->
+                <div id="att-qr-tab" class="att-tab-content" style="display: none;">
+                    <div style="text-align: center;">
+                        <p class="attendance-instruction">Show your QR Code to the camera</p>
+                        <div id="qr-reader"
+                            style="width: 100%; max-width: 400px; margin: 0 auto; border-radius: 12px; overflow: hidden;">
+                        </div>
+                        <div id="qr-result" style="margin-top: 10px; color: var(--primary-color);"></div>
+                        <button class="btn btn-primary" onclick="initQRScanner()" style="margin-top: 20px;">
+                            Start QR Scanner
                         </button>
                     </div>
                 </div>
@@ -224,6 +253,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="js/animations.js"></script>
     <script src="js/sound-alerts.js"></script>
+    <script src="js/sound-alerts.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/face-capture.js"></script>
     <script src="js/main.js"></script>
 </body>

@@ -17,8 +17,8 @@ class AdminAuth:
         """Initialize default admin account"""
         if not self.admin_file.exists():
             default_admin = {
-                'username': 'admin',
-                'password_hash': generate_password_hash('admin123'),
+                'username': 'amitsingh6394366374@gmail.com',
+                'password_hash': generate_password_hash('Amitkumar1@'),
                 'face_encoding': None,
                 'created_at': datetime.now().isoformat()
             }
@@ -49,9 +49,18 @@ class AdminAuth:
         """Verify admin password"""
         try:
             admin = self._load_admin()
+            print(f"DEBUG: Attempting login for user: {username}")
             
-            if admin and admin['username'] == username:
-                return check_password_hash(admin['password_hash'], password)
+            if admin:
+                print(f"DEBUG: Found admin user: {admin.get('username')}")
+                if admin['username'] == username:
+                    is_valid = check_password_hash(admin['password_hash'], password)
+                    print(f"DEBUG: Password valid: {is_valid}")
+                    return is_valid
+                else:
+                    print(f"DEBUG: Username mismatch. Expected {admin['username']}, got {username}")
+            else:
+                print("DEBUG: No admin data loaded")
             
             return False
         except Exception as e:

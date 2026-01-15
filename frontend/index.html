@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Attendance System</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/enhanced-modals.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z"
+                            fill="currentColor" />
+                    </svg>
+                </div>
+                <h1 class="logo-text">Face Attendance System</h1>
+            </div>
+            <a href="admin-login.html" class="admin-link">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z"
+                        fill="currentColor" />
+                </svg>
+                Admin Panel
+            </a>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2 class="hero-title">Welcome to Smart Attendance</h2>
+            <p class="hero-subtitle">Mark your attendance or register as a new student using facial recognition</p>
+        </section>
+
+        <!-- Main Cards -->
+        <div class="cards-container">
+            <!-- Register Card -->
+            <div class="card glass-card" id="register-card">
+                <div class="card-icon register-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M15 12C17.21 12 19 10.21 19 8C19 5.79 17.21 4 15 4C12.79 4 11 5.79 11 8C11 10.21 12.79 12 15 12ZM6 10V7H4V10H1V12H4V15H6V12H9V10H6ZM15 14C12.33 14 7 15.34 7 18V20H23V18C23 15.34 17.67 14 15 14Z"
+                            fill="currentColor" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Register New Student</h3>
+                <p class="card-description">New here? Register yourself with facial recognition</p>
+                <button class="btn btn-primary" onclick="showRegisterForm()">
+                    Get Started
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z"
+                            fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Attendance Card -->
+            <div class="card glass-card" id="attendance-card">
+                <div class="card-icon attendance-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9 11H7V13H9V11ZM13 11H11V13H13V11ZM17 11H15V13H17V11ZM19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V9H19V20Z"
+                            fill="currentColor" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Mark Attendance</h3>
+                <p class="card-description">Already registered? Mark your attendance now</p>
+                <button class="btn btn-secondary" onclick="showAttendanceForm()">
+                    Scan Face
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z"
+                            fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Student Registration</h3>
+                <button class="close-btn" onclick="closeModal('register-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="student-name">Full Name</label>
+                        <input type="text" id="student-name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="registration-no">Registration Number</label>
+                        <input type="text" id="registration-no" required placeholder="Enter your registration number">
+                    </div>
+                    <div class="form-group">
+                        <label>Face Capture</label>
+                        <div class="camera-container">
+                            <video id="register-video" autoplay playsinline></video>
+                            <canvas id="register-canvas" style="display: none;"></canvas>
+                            <div id="register-preview" class="preview-container" style="display: none;">
+                                <img id="register-preview-img" alt="Captured face">
+                            </div>
+                        </div>
+                        <div class="camera-controls">
+                            <button type="button" class="btn btn-outline" id="start-register-camera"
+                                onclick="startCamera('register')">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
+                                        fill="currentColor" />
+                                    <path
+                                        d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
+                                        fill="currentColor" />
+                                </svg>
+                                Start Camera
+                            </button>
+                            <button type="button" class="btn btn-primary" id="capture-register-btn"
+                                onclick="captureImage('register')" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="8" fill="currentColor" />
+                                </svg>
+                                Capture Face
+                            </button>
+                            <button type="button" class="btn btn-outline" id="retake-register-btn"
+                                onclick="retakeImage('register')" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 5V1L7 6L12 11V7C15.31 7 18 9.69 18 13C18 16.31 15.31 19 12 19C8.69 19 6 16.31 6 13H4C4 17.42 7.58 21 12 21C16.42 21 20 17.42 20 13C20 8.58 16.42 5 12 5Z"
+                                        fill="currentColor" />
+                                </svg>
+                                Retake
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="submit-register-btn">
+                        <span class="btn-text">Register Student</span>
+                        <span class="btn-loader" style="display: none;">
+                            <svg class="spinner" viewBox="0 0 50 50">
+                                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                            </svg>
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Modal -->
+    <div id="attendance-modal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Mark Attendance</h3>
+                <button class="close-btn" onclick="closeModal('attendance-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="attendance-container">
+                    <p class="attendance-instruction">Position your face in the camera and click "Scan Face"</p>
+                    <div class="camera-container">
+                        <video id="attendance-video" autoplay playsinline></video>
+                        <canvas id="attendance-canvas" style="display: none;"></canvas>
+                        <div id="attendance-preview" class="preview-container" style="display: none;">
+                            <img id="attendance-preview-img" alt="Captured face">
+                        </div>
+                    </div>
+                    <div class="camera-controls">
+                        <button type="button" class="btn btn-outline" id="start-attendance-camera"
+                            onclick="startCamera('attendance')">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
+                                    fill="currentColor" />
+                                <path
+                                    d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
+                                    fill="currentColor" />
+                            </svg>
+                            Start Camera
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="scan-attendance-btn"
+                            onclick="scanAttendance()" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
+                                    fill="currentColor" />
+                            </svg>
+                            <span class="btn-text">Scan Face</span>
+                            <span class="btn-loader" style="display: none;">
+                                <svg class="spinner" viewBox="0 0 50 50">
+                                    <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/sound-alerts.js"></script>
+    <script src="js/face-capture.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

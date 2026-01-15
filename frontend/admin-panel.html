@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Face Attendance System</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/enhanced-modals.css">
+    <link rel="stylesheet" href="css/admin-management.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body class="admin-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z"
+                        fill="currentColor" />
+                </svg>
+            </div>
+            <h2>Admin Panel</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" onclick="showSection('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 13H11V3H3V13ZM3 21H11V15H3V21ZM13 21H21V11H13V21ZM13 3V9H21V3H13Z"
+                        fill="currentColor" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="#analytics" class="nav-item" onclick="showSection('analytics')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3V21H21V19H5V3H3ZM19 17H17V10H19V17ZM15 17H13V7H15V17ZM11 17H9V13H11V17Z"
+                        fill="currentColor" />
+                </svg>
+                Analytics
+            </a>
+            <a href="#students" class="nav-item" onclick="showSection('students')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z"
+                        fill="currentColor" />
+                </svg>
+                Students
+            </a>
+            <a href="#attendance" class="nav-item" onclick="showSection('attendance')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M9 11H7V13H9V11ZM13 11H11V13H13V11ZM17 11H15V13H17V11ZM19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V9H19V20Z"
+                        fill="currentColor" />
+                </svg>
+                Attendance
+            </a>
+            <a href="qr-scanner.html" class="nav-item" target="_blank">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M3 11H11V3H3V11ZM5 5H9V9H5V5ZM3 21H11V13H3V21ZM5 15H9V19H5V15ZM13 3V11H21V3H13ZM19 9H15V5H19V9ZM19 19H21V21H19V19ZM13 13H15V15H13V13ZM15 15H17V17H15V15ZM13 17H15V19H13V17ZM15 19H17V21H15V19ZM17 17H19V19H17V17ZM17 13H19V15H17V13ZM19 15H21V17H19V15Z"
+                        fill="currentColor" />
+                </svg>
+                QR Scanner
+            </a>
+            <a href="#bulk-upload" class="nav-item" onclick="showSection('bulk-upload')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 16H15V10H19L12 3L5 10H9V16ZM5 18H19V20H5V18Z" fill="currentColor" />
+                </svg>
+                Bulk Upload
+            </a>
+            <a href="#admin-management" class="nav-item" onclick="showSection('admin-management')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14ZM12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22Z"
+                        fill="currentColor" />
+                </svg>
+                Admin Management
+            </a>
+            <a href="#settings" class="nav-item" onclick="showSection('settings')">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.28 8.87L19.36 5.55C19.24 5.33 18.99 5.26 18.77 5.33L16.38 6.29C15.88 5.91 15.35 5.59 14.76 5.35L14.4 2.81C14.36 2.57 14.16 2.4 13.92 2.4H10.08C9.84 2.4 9.65 2.57 9.61 2.81L9.25 5.35C8.66 5.59 8.12 5.92 7.63 6.29L5.24 5.33C5.02 5.25 4.77 5.33 4.65 5.55L2.74 8.87C2.62 9.08 2.66 9.34 2.86 9.48L4.89 11.06C4.84 11.36 4.8 11.69 4.8 12C4.8 12.31 4.82 12.64 4.87 12.94L2.84 14.52C2.66 14.66 2.61 14.93 2.72 15.13L4.64 18.45C4.76 18.67 5.01 18.74 5.23 18.67L7.62 17.71C8.12 18.09 8.65 18.41 9.24 18.65L9.6 21.19C9.65 21.43 9.84 21.6 10.08 21.6H13.92C14.16 21.6 14.36 21.43 14.39 21.19L14.75 18.65C15.34 18.41 15.88 18.09 16.37 17.71L18.76 18.67C18.98 18.75 19.23 18.67 19.35 18.45L21.27 15.13C21.39 14.91 21.34 14.66 21.15 14.52L19.14 12.94ZM12 15.6C10.02 15.6 8.4 13.98 8.4 12C8.4 10.02 10.02 8.4 12 8.4C13.98 8.4 15.6 10.02 15.6 12C15.6 13.98 13.98 15.6 12 15.6Z"
+                        fill="currentColor" />
+                </svg>
+                Settings
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn btn-outline btn-block" onclick="logout()">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7ZM4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z"
+                        fill="currentColor" />
+                </svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h1>Dashboard</h1>
+                <p>Overview of attendance system</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card glass-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z"
+                                fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-students">0</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+
+                <div class="stat-card glass-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M9 11H7V13H9V11ZM13 11H11V13H13V11ZM17 11H15V13H17V11ZM19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V9H19V20Z"
+                                fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-attendance">0</h3>
+                        <p>Total Attendance</p>
+                    </div>
+                </div>
+
+                <div class="stat-card glass-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
+                                fill="currentColor" />
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="today-attendance">0</h3>
+                        <p>Today's Attendance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h1>📊 Analytics</h1>
+                    <p>Attendance statistics and trends</p>
+                </div>
+                <div style="display: flex; gap: var(--spacing-sm);">
+                    <button class="btn btn-secondary" id="refresh-analytics-btn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M17.65 6.35C16.2 4.9 14.21 4 12 4C7.58 4 4.01 7.58 4.01 12C4.01 16.42 7.58 20 12 20C15.73 20 18.84 17.45 19.73 14H17.65C16.83 16.33 14.61 18 12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C13.66 6 15.14 6.69 16.22 7.78L13 11H20V4L17.65 6.35Z"
+                                fill="currentColor" />
+                        </svg>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="AnalyticsDashboard.downloadPDFReport()">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M19 12V19H5V12H3V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V12H19ZM13 12.67L15.59 10.09L17 11.5L12 16.5L7 11.5L8.41 10.09L11 12.67V3H13V12.67Z"
+                                fill="currentColor" />
+                        </svg>
+                        Download PDF
+                    </button>
+                    <button class="btn btn-outline" onclick="AnalyticsDashboard.sendEmailReport()">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"
+                                fill="currentColor" />
+                        </svg>
+                        Email Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="stats-grid" style="margin-bottom: var(--spacing-xl);">
+                <div class="stat-card glass-card">
+                    <div class="stat-info">
+                        <h3 id="total-students-stat">0</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-info">
+                        <h3 id="total-attendance-stat">0</h3>
+                        <p>Total Attendance</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-info">
+                        <h3 id="today-attendance-stat">0</h3>
+                        <p>Today's Attendance</p>
+                    </div>
+                </div>
+                <div class="stat-card glass-card">
+                    <div class="stat-info">
+                        <h3 id="avg-daily-stat">0</h3>
+                        <p>Average Daily</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--spacing-lg);">
+                <div class="glass-card" style="padding: var(--spacing-xl);">
+                    <canvas id="dailyChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="glass-card" style="padding: var(--spacing-xl);">
+                    <canvas id="weeklyChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="glass-card" style="padding: var(--spacing-xl);">
+                    <canvas id="percentageChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Students Section -->
+        <section id="students" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h1>Students</h1>
+                    <p>Manage registered students</p>
+                </div>
+                <button class="btn btn-primary" onclick="exportStudents()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M19 12V19H5V12H3V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V12H19ZM13 12.67L15.59 10.09L17 11.5L12 16.5L7 11.5L8.41 10.09L11 12.67V3H13V12.67Z"
+                            fill="currentColor" />
+                    </svg>
+                    Export to Excel
+                </button>
+            </div>
+
+            <div class="table-container glass-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Registration No</th>
+                            <th>Enrollment Date</th>
+                            <th>Image</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                Loading students...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Attendance Section -->
+        <section id="attendance" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h1>Attendance Records</h1>
+                    <p>View and export attendance data</p>
+                </div>
+                <button class="btn btn-primary" onclick="exportAttendance()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M19 12V19H5V12H3V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V12H19ZM13 12.67L15.59 10.09L17 11.5L12 16.5L7 11.5L8.41 10.09L11 12.67V3H13V12.67Z"
+                            fill="currentColor" />
+                    </svg>
+                    Export to Excel
+                </button>
+            </div>
+
+            <div class="filters glass-card" style="margin-bottom: var(--spacing-lg);">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Filter by Date Range</label>
+                    <div style="display: flex; gap: var(--spacing-sm);">
+                        <input type="date" id="start-date" placeholder="Start Date">
+                        <input type="date" id="end-date" placeholder="End Date">
+                        <button class="btn btn-secondary" onclick="filterAttendance()">Apply Filter</button>
+                        <button class="btn btn-outline" onclick="clearFilters()">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container glass-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Registration No</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Image</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-table-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                Loading attendance records...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Bulk Upload Section -->
+        <section id="bulk-upload" class="content-section">
+            <div class="section-header">
+                <h1>Bulk Upload</h1>
+                <p>Upload multiple students via CSV/Excel</p>
+            </div>
+
+            <div class="glass-card">
+                <div class="upload-instructions">
+                    <h3>Upload Instructions</h3>
+                    <ol>
+                        <li>Prepare a CSV file with columns: <code>name</code>, <code>registration_no</code>,
+                            <code>image_path</code>
+                        </li>
+                        <li>Create a folder named "images" with student photos (filename should match registration
+                            number)</li>
+                        <li>Compress the CSV and images folder into a ZIP file</li>
+                        <li>Upload the ZIP file below</li>
+                    </ol>
+                    <p style="color: var(--text-muted); margin-top: var(--spacing-md);">
+                        <strong>Note:</strong> The system will automatically process face encodings for all uploaded
+                        images.
+                    </p>
+                </div>
+
+                <div class="upload-area" id="upload-area">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 16H15V10H19L12 3L5 10H9V16ZM5 18H19V20H5V18Z" fill="currentColor" />
+                    </svg>
+                    <h3>Drop ZIP file here or click to browse</h3>
+                    <p>Supports .zip and .csv files</p>
+                    <input type="file" id="bulk-file-input" accept=".zip,.csv" style="display: none;">
+                </div>
+
+                <div id="upload-progress" style="display: none; margin-top: var(--spacing-lg);">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p id="upload-status"
+                        style="text-align: center; margin-top: var(--spacing-sm); color: var(--text-secondary);"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Management Section -->
+        <section id="admin-management" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h1>👥 Admin Management</h1>
+                    <p>Manage admin accounts and permissions</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddAdminModal()">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor" />
+                    </svg>
+                    Add New Admin
+                </button>
+            </div>
+
+            <div class="table-container glass-card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admins-table-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                Loading admins...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="content-section">
+            <div class="section-header">
+                <h1>Settings</h1>
+                <p>Admin configuration</p>
+            </div>
+
+            <div class="glass-card">
+                <h3>Register Admin Face</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
+                    Register your face to enable face recognition login
+                </p>
+
+                <div class="form-group">
+                    <div class="camera-container">
+                        <video id="settings-video" autoplay playsinline></video>
+                        <canvas id="settings-canvas" style="display: none;"></canvas>
+                        <div id="settings-preview" class="preview-container" style="display: none;">
+                            <img id="settings-preview-img" alt="Captured face">
+                        </div>
+                    </div>
+                    <div class="camera-controls">
+                        <button type="button" class="btn btn-outline" id="start-settings-camera"
+                            onclick="startCamera('settings')">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
+                                    fill="currentColor" />
+                                <path
+                                    d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z"
+                                    fill="currentColor" />
+                            </svg>
+                            Start Camera
+                        </button>
+                        <button type="button" class="btn btn-primary" id="capture-settings-btn"
+                            onclick="captureImage('settings')" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="8" fill="currentColor" />
+                            </svg>
+                            Capture Face
+                        </button>
+                        <button type="button" class="btn btn-outline" id="retake-settings-btn"
+                            onclick="retakeImage('settings')" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 5V1L7 6L12 11V7C15.31 7 18 9.69 18 13C18 16.31 15.31 19 12 19C8.69 19 6 16.31 6 13H4C4 17.42 7.58 21 12 21C16.42 21 20 17.42 20 13C20 8.58 16.42 5 12 5Z"
+                                    fill="currentColor" />
+                            </svg>
+                            Retake
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-block" onclick="registerAdminFace()"
+                        style="margin-top: var(--spacing-md);">
+                        Save Admin Face
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Scripts -->
+    <script src="js/sound-alerts.js"></script>
+    <script src="js/face-capture.js"></script>
+    <script src="js/analytics-dashboard.js"></script>
+    <script src="js/admin-management.js"></script>
+    <script src="js/support-system.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html><!-- Add these sections to admin-panel.html before Settings section -->
+
+<!-- Student Support Section -->
+<section id="student-support" class="content-section">
+    <div class="section-header">
+        <div>
+            <h1>ðŸ’¬ Student Support</h1>
+            <p>Manage student support tickets</p>
+        </div>
+        <div style="display: flex; gap: var(--spacing-sm);">
+            <button class="btn btn-secondary" onclick="loadSupportTickets()">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M17.65 6.35C16.2 4.9 14.21 4 12 4C7.58 4 4.01 7.58 4.01 12C4.01 16.42 7.58 20 12 20C15.73 20 18.84 17.45 19.73 14H17.65C16.83 16.33 14.61 18 12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C13.66 6 15.14 6.69 16.22 7.78L13 11H20V4L17.65 6.35Z"
+                        fill="currentColor" />
+                </svg>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Ticket Stats -->
+    <div class="stats-grid" style="margin-bottom: var(--spacing-xl);">
+        <div class="stat-card glass-card">
+            <div class="stat-info">
+                <h3 id="total-tickets-stat">0</h3>
+                <p>Total Tickets</p>
+            </div>
+        </div>
+        <div class="stat-card glass-card">
+            <div class="stat-info">
+                <h3 id="open-tickets-stat">0</h3>
+                <p>Open Tickets</p>
+            </div>
+        </div>
+        <div class="stat-card glass-card">
+            <div class="stat-info">
+                <h3 id="progress-tickets-stat">0</h3>
+                <p>In Progress</p>
+            </div>
+        </div>
+        <div class="stat-card glass-card">
+            <div class="stat-info">
+                <h3 id="resolved-tickets-stat">0</h3>
+                <p>Resolved</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="table-container glass-card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ticket ID</th>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="support-tickets-tbody">
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem;">Loading tickets...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Admin Support Section -->
+<section id="admin-support" class="content-section">
+    <div class="section-header">
+        <h1>ðŸ†˜ Admin Support</h1>
+        <p>Request help from system administrator</p>
+    </div>
+
+    <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+        <div style="padding: var(--spacing-xl);">
+            <div
+                style="background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary-color); padding: var(--spacing-lg); border-radius: var(--radius-md); margin-bottom: var(--spacing-xl);">
+                <h3 style="margin-bottom: var(--spacing-sm);">ðŸ“§ Need Technical Help?</h3>
+                <p style="color: var(--text-secondary);">
+                    If you're experiencing technical issues or need assistance with the system,
+                    send a support request directly to the system administrator at
+                    <strong>amitsingh6394366374@gmail.com</strong>
+                </p>
+            </div>
+
+            <form id="admin-support-form">
+                <div class="form-group">
+                    <label for="admin-support-subject">Subject</label>
+                    <input type="text" id="admin-support-subject" placeholder="Brief description of your issue"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-support-message">Message</label>
+                    <textarea id="admin-support-message" rows="8" placeholder="Please describe your issue in detail..."
+                        required
+                        style="width: 100%; padding: var(--spacing-md); background: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: var(--radius-md); color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z"
+                            fill="currentColor" />
+                    </svg>
+                    Send Support Request to System Admin
+                </button>
+            </form>
+        </div>
+    </div>
+</section>

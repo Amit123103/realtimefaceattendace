@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner - Face Attendance System</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/enhanced-modals.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        .scanner-container {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: var(--spacing-xl);
+        }
+
+        .scanner-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xxl);
+            box-shadow: var(--shadow-xl);
+            text-align: center;
+        }
+
+        .scanner-card h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .scanner-card p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        #qr-reader {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .scan-result {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+            display: none;
+        }
+
+        .scan-result.show {
+            display: block;
+        }
+
+        .result-success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .result-error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .scanner-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-scanning {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 3D Background -->
+    <div id="particles-js"></div>
+    <canvas id="three-canvas"></canvas>
+
+    <div class="scanner-container">
+        <div class="scanner-card fade-in">
+            <h1>📱 QR Code Scanner</h1>
+            <p>Scan student QR code to mark attendance</p>
+
+            <div class="scanner-status status-ready" id="scanner-status">Ready to Scan</div>
+
+            <div id="qr-reader"></div>
+
+            <button class="btn btn-primary" id="start-scan-btn" onclick="startScanning()">
+                Start Scanning
+            </button>
+
+            <button class="btn btn-secondary" id="stop-scan-btn" onclick="stopScanning()" style="display: none;">
+                Stop Scanning
+            </button>
+
+            <div class="scan-result" id="scan-result">
+                <h3 id="result-title"></h3>
+                <p id="result-message"></p>
+            </div>
+
+            <div style="margin-top: var(--spacing-xl);">
+                <a href="admin-panel.html" class="btn btn-secondary">Back to Admin Panel</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/sound-alerts.js"></script>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let html5QrCode = null;
+        let isScanning = false;
+
+        function startScanning() {
+            if (isScanning) return;
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+            };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                isScanning = true;
+                document.getElementById('start-scan-btn').style.display = 'none';
+                document.getElementById('stop-scan-btn').style.display = 'inline-block';
+                document.getElementById('scanner-status').textContent = 'Scanning...';
+                document.getElementById('scanner-status').className = 'scanner-status status-scanning';
+            }).catch(err => {
+                console.error('Error starting scanner:', err);
+                enhancedModal.showError('Scanner Error', 'Could not access camera. Please allow camera permissions.');
+            });
+        }
+
+        function stopScanning() {
+            if (!isScanning || !html5QrCode) return;
+
+            html5QrCode.stop().then(() => {
+                isScanning = false;
+                document.getElementById('start-scan-btn').style.display = 'inline-block';
+                document.getElementById('stop-scan-btn').style.display = 'none';
+                document.getElementById('scanner-status').textContent = 'Ready to Scan';
+                document.getElementById('scanner-status').className = 'scanner-status status-ready';
+            }).catch(err => {
+                console.error('Error stopping scanner:', err);
+            });
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            console.log(`QR Code detected: ${decodedText}`);
+
+            // Stop scanning temporarily
+            if (html5QrCode && isScanning) {
+                await html5QrCode.pause();
+            }
+
+            // Send to backend
+            try {
+                const response = await fetch(`${API_BASE_URL}/scan-qr-attendance`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        qr_data: decodedText
+                    })
+                });
+
+                const data = await response.json();
+
+                const resultDiv = document.getElementById('scan-result');
+                const resultTitle = document.getElementById('result-title');
+                const resultMessage = document.getElementById('result-message');
+
+                if (data.success) {
+                    // Success
+                    resultDiv.className = 'scan-result result-success show';
+                    resultTitle.textContent = '✓ Attendance Marked!';
+                    resultMessage.textContent = `${data.data.name} (${data.data.registration_no}) - ${data.data.time}`;
+
+                    enhancedModal.showSuccess(
+                        'Attendance Marked!',
+                        `${data.data.name}'s attendance has been recorded.`,
+                        {
+                            'Registration No': data.data.registration_no,
+                            'Time': data.data.time
+                        }
+                    );
+                } else {
+                    // Error
+                    resultDiv.className = 'scan-result result-error show';
+                    resultTitle.textContent = '✗ Scan Failed';
+                    resultMessage.textContent = data.message || 'Invalid QR code';
+
+                    enhancedModal.showError('Scan Failed', data.message || 'Invalid QR code');
+                }
+
+                // Resume scanning after 3 seconds
+                setTimeout(() => {
+                    if (html5QrCode && isScanning) {
+                        html5QrCode.resume();
+                    }
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error marking attendance:', error);
+                enhancedModal.showError('Error', 'Could not mark attendance. Please try again.');
+
+                // Resume scanning
+                if (html5QrCode && isScanning) {
+                    html5QrCode.resume();
+                }
+            }
+        }
+
+        function onScanError(errorMessage) {
+            // Ignore scan errors (they happen frequently while scanning)
+        }
+    </script>
+</body>
+
+</html>

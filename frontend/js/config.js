@@ -8,7 +8,7 @@ window.API_BASE_URL = (() => {
     // Check if we're on GitHub Pages
     if (host === 'amit123103.github.io') {
         // Production - Deployed backend on Render
-        return 'https://faceattendance-509d.onrender.com/api';
+        return 'https://face-attendance-ajre.onrender.com/api';
     } else if (host === 'localhost' || host === '127.0.0.1' || host === '') {
         // Local development or file:// access
         return 'http://localhost:8000/api';

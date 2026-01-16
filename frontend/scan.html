@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="js/config.js"></script>
 </head>
 
 <body>
@@ -48,7 +49,7 @@
     </div>
 
     <script>
-        const API_URL = "/api";
+        const API_URL = API_BASE_URL;
         let currentMode = 'face';
         let faceInterval = null;
         let html5QrCode = null;

@@ -11,10 +11,10 @@ window.API_BASE_URL = (() => {
         return 'https://faceattendance-509d.onrender.com/api';
     } else if (host === 'localhost' || host === '127.0.0.1' || host === '') {
         // Local development or file:// access
-        return 'http://localhost:5000/api';
+        return 'http://localhost:8000/api';
     } else {
         // Network access (e.g. 192.168.x.x) - assume backend is on same IP port 5000
-        return `http://${host}:5000/api`;
+        return `http://${host}:8000/api`;
     }
 })();
 

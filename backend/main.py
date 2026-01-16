@@ -33,7 +33,13 @@ app = FastAPI(title="Student Attendance System")
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:8000",
+        "http://localhost:5000",
+        "http://127.0.0.1:8000",
+        "http://127.0.0.1:5000",
+        "https://amit123103.github.io",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

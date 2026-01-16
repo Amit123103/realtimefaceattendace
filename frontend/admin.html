@@ -7,6 +7,7 @@
     <title>Admin & Reports</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="js/config.js"></script>
     <script>
         // Use inline script to block rendering if not logged in
         // Debugging
@@ -96,7 +97,7 @@
             window.location.replace('login.html');
         }
 
-        const API_URL = "/api";
+        const API_URL = API_BASE_URL;
 
         function logout() {
             sessionStorage.removeItem('admin_token');

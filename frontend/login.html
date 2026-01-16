@@ -7,6 +7,7 @@
     <title>Admin Login</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="js/config.js"></script>
     <style>
         .password-container {
             position: relative;
@@ -66,7 +67,7 @@
     </div>
 
     <script>
-        const API_URL = "/api";
+        const API_URL = API_BASE_URL;
 
         function togglePassword() {
             const passwordInput = document.getElementById('passwordInput');

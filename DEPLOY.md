@@ -18,6 +18,35 @@ The `Procfile` is already configured.
 5.  **Environment Variables:**
     *   Set `PYTHON_VERSION` if needed (e.g. 3.10+).
 
+### 📋 Deployment "Cheat Sheet" (Copy & Paste these values)
+
+When you create a new **Web Service** on Render/Railway, fill in these details:
+
+| Field | Value |
+| :--- | :--- |
+| **Name** | `face-attendance` (or any name) |
+| **Region** | Singapore (or closest to you) |
+| **Repository** | `https://github.com/Amit123103/realtimefaceattendace` |
+| **Branch** | `main` |
+| **Root Directory** | `.` (Leave empty / default) |
+| **Build Command** | `pip install -r backend/requirements_fastapi.txt` |
+| **Start Command** | `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| **Environment Variables** | Key: `PYTHON_VERSION`, Value: `3.10.0` |
+
+---
+
+**⚠️ CRITICAL WARNING FOR FREE TIER:**
+Services like Render Free Tier or Heroku are "Ephemeral". This means **every time you deploy or the app restarts, your Database and Images will be DELETED.**
+To keep your data, you MUST:
+1.  Use a paid plan with "Persistent Disks" (Render/Railway).
+2.  OR use a Cloud Database (PostgreSQL) and Cloud Storage (AWS S3) for images.
+3.  OR use a **VPS** (Option 2 below), which keeps files forever.
+
+**Recommended Platforms:**
+*   [Render](https://render.com) (Easiest, has persistent disk option)
+*   [Railway](https://railway.app) (Great developer experience)
+*   [PythonAnywhere](https://www.pythonanywhere.com) (Good for Python, persistent by default)
+
 ### 2. VPS (Ubuntu/Debian)
 
 1.  Clone the repository.

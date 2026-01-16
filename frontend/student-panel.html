@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Student Portal</h1>
+            <nav>
+                <a href="#" class="active">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="card" style="text-align: center; max-width: 500px; margin: 0 auto;">
+                <h2 id="welcomeMsg">Welcome, Student</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                    Here is your unique, secure QR code for attendance.
+                    <br>This code is newly generated for this session.
+                </p>
+
+                <div
+                    style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 1rem; display: inline-block;">
+                    <img id="qrImage" src="" alt="Loading QR..."
+                        style="width: 250px; height: 250px; border-radius: 8px;">
+                </div>
+
+                <p style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted);">
+                    Scan this at the kiosk to mark your attendance.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = "/api";
+        const token = sessionStorage.getItem('student_token');
+        const name = sessionStorage.getItem('student_name');
+
+        if (!token) {
+            window.location.href = 'student-login.html';
+        } else {
+            document.getElementById('welcomeMsg').innerText = `Welcome, ${name || 'Student'}`;
+            loadQR();
+        }
+
+        async function loadQR() {
+            try {
+                // Get the profile to ensure we have the Reg No
+                const res = await fetch(`${API_URL}/student/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error("Session expired");
+                const student = await res.json();
+
+                // Get QR Image
+                const qrRes = await fetch(`${API_URL}/students/${student.registration_number}/qr`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const blob = await qrRes.blob();
+                document.getElementById('qrImage').src = URL.createObjectURL(blob);
+
+            } catch (err) {
+                alert("Session expired. Please login again.");
+                logout();
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('student_token');
+            sessionStorage.removeItem('student_name');
+            window.location.href = 'student-login.html';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+        <div class="card" style="width: 100%; max-width: 400px;" id="loginCard">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Student Login</h2>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Registration Number</label>
+                    <input type="text" name="registration_number" required placeholder="e.g. S12345">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-container">
+                        <input type="password" name="password" id="passwordInput" required placeholder="Enter password">
+                        <span class="toggle-password" onclick="togglePassword()">
+                            <!-- Eye Icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" id="eyeIcon">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+
+            <p style="text-align: right; margin-top: 0.5rem; font-size: 0.9rem;">
+                <a href="forgot-password.html" style="color: var(--text-muted);">Forgot Password?</a>
+            </p>
+
+            <p style="text-align: center; margin-top: 1.5rem;">
+                New User? <a href="student-register.html" style="color: var(--primary);">Create Account</a>
+            </p>
+            <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem;">
+                <a href="index.html" style="color: var(--text-muted); text-decoration: none;">&larr; Back to Home</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "/api";
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = "Logging in...";
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch(`${API_URL}/auth/student/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    sessionStorage.setItem('student_token', result.access_token);
+                    sessionStorage.setItem('student_name', result.name);
+                    window.location.href = 'student-panel.html';
+                } else {
+                    alert(result.detail || "Login failed");
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
+                alert(`Error: ${err.message}. Check console for details.`);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Login";
+            }
+        });
+    </script>
+</body>
+
+</html>

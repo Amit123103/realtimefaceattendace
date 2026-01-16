@@ -161,3 +161,13 @@ function resetCameraUI(context) {
     if (captureBtn) captureBtn.style.display = 'none';
     if (retakeBtn) retakeBtn.style.display = 'none';
 }
+
+// Explicitly export to window
+window.startCamera = startCamera;
+window.stopCamera = stopCamera;
+window.captureImage = captureImage;
+window.retakeImage = retakeImage;
+window.getCapturedImage = getCapturedImage;
+window.clearCapturedImage = clearCapturedImage;
+window.hasImageCaptured = hasImageCaptured;
+window.resetCameraUI = resetCameraUI;

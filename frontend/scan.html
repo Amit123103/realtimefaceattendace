@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Mark Attendance</h1>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="register.html">Register Student</a>
+                <a href="scan.html" class="active">Mark Attendance</a>
+                <a href="admin.html">Admin & Reports</a>
+            </nav>
+        </header>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center;">
+            <button onclick="setMode('face')" class="btn btn-secondary" id="btn-face">Face Scan</button>
+            <button onclick="setMode('qr')" class="btn btn-secondary" id="btn-qr">QR Scan</button>
+        </div>
+
+        <main class="grid" style="grid-template-columns: 1fr;">
+            <!-- Camera Section -->
+            <div class="card"
+                style="display: flex; flex-direction: column; align-items: center; max-width: 800px; margin: 0 auto; width: 100%;">
+
+                <h2 id="mode-title">Face Attendance</h2>
+
+                <div class="camera-container" style="margin-top: 1rem;">
+                    <div id="qr-reader" style="width: 100%;"></div>
+                    <video id="face-video" autoplay playsinline style="display:none"></video>
+                    <div class="scan-line" id="scan-line"></div>
+                </div>
+
+                <div id="result-area" style="margin-top: 1.5rem; width: 100%; text-align: center;">
+                    <p style="color: var(--text-muted)">Ready to scan...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = "/api";
+        let currentMode = 'face';
+        let faceInterval = null;
+        let html5QrCode = null;
+
+        // URL Param Check
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'qr') setMode('qr');
+        else setMode('face');
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-face').className = mode === 'face' ? 'btn btn-primary' : 'btn btn-secondary';
+            document.getElementById('btn-qr').className = mode === 'qr' ? 'btn btn-primary' : 'btn btn-secondary';
+            document.getElementById('mode-title').innerText = mode === 'face' ? 'Face Attendance' : 'QR Attendance';
+
+            stopAll();
+
+            if (mode === 'face') startFaceScan();
+            else startQRScan();
+        }
+
+        function stopAll() {
+            if (faceInterval) clearInterval(faceInterval);
+            if (html5QrCode) {
+                html5QrCode.stop().catch(err => console.log("QR Stop Error", err));
+                html5QrCode = null;
+            }
+            const v = document.getElementById('face-video');
+            if (v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
+            v.style.display = 'none';
+            document.getElementById('qr-reader').style.display = 'none';
+            document.getElementById('scan-line').style.display = 'none';
+        }
+
+        async function startFaceScan() {
+            const video = document.getElementById('face-video');
+            video.style.display = 'block';
+            document.getElementById('scan-line').style.display = 'block';
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+
+                // Auto scan every 2 seconds
+                faceInterval = setInterval(captureAndSendFace, 2000);
+            } catch (err) {
+                showResult("Camera Error: " + err.message, "error");
+            }
+        }
+
+        async function captureAndSendFace() {
+            const video = document.getElementById('face-video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('image', blob);
+
+                try {
+                    const res = await fetch(`${API_URL}/attendance/face`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        showResult(`✅ ${data.message} (${data.confidence}%)`, "success");
+                    } else if (data.detail !== "No face detected in scan") {
+                        // Ignore "No face" errors for smoother UI, show others
+                        if (data.status === "duplicate") {
+                            showResult(`⚠️ ${data.message}`, "warning");
+                        } else {
+                            // Only show real errors
+                            // showResult(`❌ ${data.detail}`, "error");
+                        }
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }, 'image/jpeg');
+        }
+
+        function startQRScan() {
+            document.getElementById('qr-reader').style.display = 'block';
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                async (decodedText, decodedResult) => {
+                    // Handle Scan
+                    html5QrCode.pause(); // Pause scanning
+                    showResult("Processing QR...", "neutral");
+
+                    const formData = new FormData();
+                    formData.append('qr_payload', decodedText);
+
+                    try {
+                        const res = await fetch(`${API_URL}/attendance/qr`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await res.json();
+
+                        if (res.ok || data.status === 'duplicate') {
+                            showResult(data.message, data.status === 'duplicate' ? 'warning' : 'success');
+                            setTimeout(() => html5QrCode.resume(), 3000);
+                        } else {
+                            showResult(data.detail, 'error');
+                            setTimeout(() => html5QrCode.resume(), 3000);
+                        }
+                    } catch (e) {
+                        showResult("Network Error", 'error');
+                        setTimeout(() => html5QrCode.resume(), 3000);
+                    }
+                },
+                (errorMessage) => {
+                    // parse error, ignore
+                }
+            ).catch(err => {
+                showResult("QR Start Error: " + err, "error");
+            });
+        }
+
+        function showResult(msg, type) {
+            const el = document.getElementById('result-area');
+            let color = 'var(--text-main)';
+            if (type === 'success') color = 'var(--success)';
+            if (type === 'error') color = 'var(--error)';
+            if (type === 'warning') color = '#f59e0b';
+
+            el.innerHTML = `<h3 style="color: ${color}">${msg}</h3>`;
+        }
+    </script>
+</body>
+
+</html>

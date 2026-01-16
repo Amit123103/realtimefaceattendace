@@ -10,7 +10,7 @@
     --success-color: #10b981;
     --error-color: #ef4444;
     --warning-color: #f59e0b;
-    
+
     /* Dark Theme Colors */
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
@@ -18,30 +18,30 @@
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
     --text-muted: #94a3b8;
-    
+
     /* Glass Effect */
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.3);
-    
+
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 1.5rem;
     --spacing-lg: 2rem;
     --spacing-xl: 3rem;
-    
+
     /* Border Radius */
     --radius-sm: 0.5rem;
     --radius-md: 1rem;
     --radius-lg: 1.5rem;
     --radius-xl: 2rem;
-    
+
     /* Transitions */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-    
+
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -194,7 +194,7 @@ body {
 /* Cards Container */
 .cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
 }
@@ -567,10 +567,12 @@ body {
         stroke-dasharray: 1, 150;
         stroke-dashoffset: 0;
     }
+
     50% {
         stroke-dasharray: 90, 150;
         stroke-dashoffset: -35;
     }
+
     100% {
         stroke-dasharray: 90, 150;
         stroke-dashoffset: -124;
@@ -582,19 +584,19 @@ body {
     .hero-title {
         font-size: 2.5rem;
     }
-    
+
     .hero-subtitle {
         font-size: 1.1rem;
     }
-    
+
     .cards-container {
         grid-template-columns: 1fr;
     }
-    
+
     .camera-controls {
         flex-direction: column;
     }
-    
+
     .camera-controls .btn {
         width: 100%;
     }

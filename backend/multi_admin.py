@@ -2,10 +2,14 @@ import pandas as pd
 from pathlib import Path
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
+import numpy as np
+import os
 
 class MultiAdminHandler:
     def __init__(self, admins_file='../data/admins.xlsx'):
         self.admins_file = Path(admins_file)
+        self.exclude_dir = self.admins_file.parent / 'admins_data'
+        self.exclude_dir.mkdir(parents=True, exist_ok=True)
         self._init_admins_file()
     
     def _init_admins_file(self):
@@ -176,3 +180,76 @@ class MultiAdminHandler:
         except Exception as e:
             print(f"Error checking permission: {e}")
             return False
+
+    def delete_admin(self, username):
+        """Permanently delete admin account"""
+        try:
+            df = pd.read_excel(self.admins_file)
+            
+            if username not in df['Username'].values:
+                return False, "Admin not found"
+            
+            if username == 'admin':
+                return False, "Cannot delete default super admin"
+            
+            # Filter out the admin to delete
+            df = df[df['Username'] != username]
+            df.to_excel(self.admins_file, index=False)
+            
+            return True, "Admin deleted successfully"
+        except Exception as e:
+            print(f"Error deleting admin: {e}")
+            return False, str(e)
+
+    def update_admin_face(self, username, face_encoding):
+        """Update admin face encoding"""
+        try:
+            df = pd.read_excel(self.admins_file)
+            
+            if username not in df['Username'].values:
+                return False, "Admin not found"
+            
+            # Save encoding to npy file
+            npy_filename = f"{username}_face.npy"
+            npy_path = self.exclude_dir / npy_filename
+            np.save(npy_path, face_encoding)
+            
+            # Update path in Excel
+            df.loc[df['Username'] == username, 'Face Encoding Path'] = str(npy_path)
+            df.to_excel(self.admins_file, index=False)
+            
+            return True, "Face registered successfully"
+        except Exception as e:
+            print(f"Error updating admin face: {e}")
+            return False, str(e)
+
+    def verify_face_login(self, face_encoding):
+        """Verify login using face encoding"""
+        try:
+            import face_recognition
+            df = pd.read_excel(self.admins_file)
+            
+            # Filter admins with face data
+            admins_with_face = df[df['Face Encoding Path'].notna() & (df['Face Encoding Path'] != 'None')]
+            
+            for _, admin in admins_with_face.iterrows():
+                try:
+                    encoding_path = admin['Face Encoding Path']
+                    if not os.path.exists(encoding_path):
+                        continue
+                        
+                    stored_encoding = np.load(encoding_path)
+                    
+                    matches = face_recognition.compare_faces([stored_encoding], face_encoding, tolerance=0.5)
+                    if matches[0]:
+                        if admin['Status'] != 'active':
+                            return False, "Account is inactive"
+                        return True, admin['Username']
+                except Exception as inner_e:
+                    print(f"Error checking face for {admin['Username']}: {inner_e}")
+                    continue
+            
+            return False, "Face not recognized"
+        except Exception as e:
+            print(f"Error validating face login: {e}")
+            return False, str(e)

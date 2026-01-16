@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+python-multipart
+opencv-python
+numpy==1.26.4
+qrcode[pil]
+pandas==2.2.2
+openpyxl
+python-jose[cryptography]
+passlib[bcrypt]
+jinja2
+requests
+python-dotenv
+aiofiles

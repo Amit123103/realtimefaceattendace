@@ -1,1 +1,1 @@
-web: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --timeout 120
+web: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT

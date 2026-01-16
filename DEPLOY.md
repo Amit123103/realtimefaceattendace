@@ -1,0 +1,46 @@
+# Deployment Guide
+
+This project is a centralized Face Attendance System combining a FastAPI backend and a static HTML/JS frontend.
+
+## Deployment Options
+
+### 1. Render / Railway / Heroku (PaaS)
+
+This project is ready for Platform-as-a-Service deployment.
+The `Procfile` is already configured.
+
+**Steps:**
+1.  Push this code to a GitHub repository.
+2.  Connect the repository to your PaaS provider (e.g. Render).
+3.  **Build Command:** `pip install -r backend/requirements_fastapi.txt`
+4.  **Start Command:** `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`
+    *   *Note: The `Procfile` already contains this.*
+5.  **Environment Variables:**
+    *   Set `PYTHON_VERSION` if needed (e.g. 3.10+).
+
+### 2. VPS (Ubuntu/Debian)
+
+1.  Clone the repository.
+2.  Install Python 3.10+ and pip.
+3.  Install dependencies:
+    ```bash
+    pip install -r backend/requirements_fastapi.txt
+    ```
+4.  Run the server:
+    ```bash
+    cd backend
+    python -m uvicorn main:app --host 0.0.0.0 --port 80
+    ```
+5.  Use `supervisor` or `systemd` to keep it running.
+
+## Configuration
+
+*   **API URL**: The frontend is configured to use relative paths (`/api`), so it will automatically work with the backend serving it.
+*   **Static Files**: The backend automatically serves the `frontend` folder at the root URL `/`.
+*   **Database**: Uses `sqlite` by default (`attendance.db`). For production, consider switching to PostgreSQL if data persistence across re-deployments is critical (SQLite files on some PaaS are ephemeral).
+
+## Folder Structure
+
+*   `backend/`: FastAPI application.
+*   `frontend/`: Static HTML/CSS/JS files.
+*   `data/`: Stores images and SQLite DB (Ensure this persists if possible).

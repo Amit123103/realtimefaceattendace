@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+
+        <div class="card" style="width: 100%; max-width: 400px;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Admin Login</h2>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required placeholder="Enter username" autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-container">
+                        <input type="password" name="password" id="passwordInput" required placeholder="Enter password"
+                            autocomplete="current-password">
+                        <span class="toggle-password" onclick="togglePassword()">
+                            <!-- Eye Icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" id="eyeIcon">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+
+            <p id="errorMsg" style="color: var(--error); margin-top: 1rem; text-align: center; display: none;"></p>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "/api";
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                // Change icon to 'eye-off' representation (slash)
+                eyeIcon.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                passwordInput.type = 'password';
+                // Reset to normal eye
+                eyeIcon.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('errorMsg');
+            const btn = document.querySelector('button[type="submit"]');
+
+            // Reset error
+            errorEl.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = "Logging in...";
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch(`${API_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                let result;
+                try {
+                    result = await res.json();
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    throw new Error('Invalid response from server');
+                }
+
+                if (res.ok) {
+                    sessionStorage.setItem('admin_token', result.access_token);
+                    sessionStorage.setItem('admin_user', result.username);
+
+                    // Immediate redirect
+                    window.location.href = 'admin.html';
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "Login";
+                    showError(result.detail || 'Login failed. Please check your credentials.');
+                }
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerText = "Login";
+                showError('Server error. Is the backend running? Check console for more info.');
+            }
+        });
+
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

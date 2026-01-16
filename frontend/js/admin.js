@@ -396,7 +396,7 @@ async function registerAdminFace() {
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
         localStorage.removeItem('admin_session');
-        window.location.href = 'admin-login.html';
+        window.location.href = 'index.html';
     }
 }
 

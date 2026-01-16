@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin & Reports</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Use inline script to block rendering if not logged in
+        // Debugging
+        const token = sessionStorage.getItem('admin_token');
+        if (!token || token === 'undefined') {
+            window.location.replace('login.html');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin Panel</h1>
+            <nav style="display: flex; align-items: center;">
+                <a href="index.html">Dashboard</a>
+                <a href="register.html">Register Student</a>
+                <a href="scan.html">Mark Attendance</a>
+                <a href="admin.html" class="active">Admin & Reports</a>
+                <button onclick="logout()" class="btn btn-secondary"
+                    style="margin-left: 1rem; padding: 0.5rem 1rem; font-size: 0.8rem;">Logout</button>
+            </nav>
+        </header>
+
+        <main class="grid" style="grid-template-columns: 1fr;">
+
+            <!-- Excel Upload -->
+            <div class="card">
+                <h2>Upload Attendance (Excel/CSV)</h2>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; align-items: center;">
+                    <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
+                    <button onclick="uploadExcel()" class="btn btn-primary">Upload & Mark</button>
+                </div>
+                <div id="uploadResult" style="margin-top: 1rem;"></div>
+            </div>
+
+            <!-- Dataset Upload -->
+            <div class="card">
+                <h2>Upload Photo Dataset (ZIP)</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                    Upload a .zip file containing student photos. <br>
+                    <strong>Note:</strong> Name image files as <code>REGISTRATION_NO.jpg</code> (e.g.
+                    <code>S101.jpg</code>).
+                </p>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="file" id="zipFile" accept=".zip">
+                    <button onclick="uploadDataset()" class="btn btn-primary">Bulk Register</button>
+                </div>
+                <div id="zipResult" style="margin-top: 1rem;"></div>
+            </div>
+
+            <!-- Report Section -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>Attendance Report</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="date" id="reportDate" style="width: auto;">
+                        <button onclick="loadReport()" class="btn btn-secondary">Filter</button>
+                        <button onclick="downloadReport()" class="btn btn-primary">Export Excel</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reg No</th>
+                                <th>Name</th>
+                                <th>Dept</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Method</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            <!-- Data -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Check session storage instead of local storage
+        if (!sessionStorage.getItem('admin_token')) {
+            window.location.replace('login.html');
+        }
+
+        const API_URL = "/api";
+
+        function logout() {
+            sessionStorage.removeItem('admin_token');
+            sessionStorage.removeItem('admin_user');
+            window.location.href = 'login.html';
+        }
+
+        function getAuthHeader() {
+            return {
+                'Authorization': `Bearer ${sessionStorage.getItem('admin_token')}`
+            };
+        }
+
+        // Set today's date and load report
+        document.getElementById('reportDate').valueAsDate = new Date();
+        loadReport();
+
+        async function uploadExcel() {
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+            if (!file) return alert("Select a file first");
+
+            const formData = new FormData();
+            formData.append('file', file);
+            await performUpload(formData, 'attendance/excel', 'uploadResult');
+        }
+
+        async function uploadDataset() {
+            const fileInput = document.getElementById('zipFile');
+            const file = fileInput.files[0];
+            if (!file) return alert("Select a ZIP file first");
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const btn = document.querySelector('button[onclick="uploadDataset()"]');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/students/bulk-register`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('admin_token')}`
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    let msg = `<span style="color:var(--success)">Registered: ${data.success.length}</span><br>`;
+                    if (data.failed.length) msg += `<span style="color:var(--error)">Failed: ${data.failed.join(', ')}</span><br>`;
+                    if (data.skipped.length) msg += `<span style="color:var(--text-muted)">Skipped (Exist): ${data.skipped.length}</span>`;
+                    document.getElementById('zipResult').innerHTML = msg;
+                } else {
+                    alert(data.detail || "Upload failed");
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+            } finally {
+                btn.innerText = "Bulk Register";
+                btn.disabled = false;
+            }
+        }
+
+        async function performUpload(formData, endpoint, resultId) {
+            try {
+                const res = await fetch(`${API_URL}/${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('admin_token')}`
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    let msg = `<span style="color:var(--success)">Marked: ${data.marked.length}</span>, `;
+                    msg += `<span style="color:var(--text-muted)">Duplicates: ${data.duplicates.length}</span>, `;
+                    msg += `<span style="color:var(--error)">Not Found: ${data.not_found.length}</span>`;
+                    document.getElementById(resultId).innerHTML = msg;
+                    loadReport(); // Refresh table
+                } else {
+                    if (res.status === 401) {
+                        alert("Session expired. Please login again.");
+                        logout();
+                    } else {
+                        alert(data.detail);
+                    }
+                }
+            } catch (e) {
+                alert("Upload failed: " + e.message);
+            }
+        }
+
+        async function loadReport() {
+            const date = document.getElementById('reportDate').value;
+            try {
+                const res = await fetch(`${API_URL}/reports?date_str=${date}`, {
+                    headers: getAuthHeader()
+                });
+
+                if (res.status === 401) {
+                    // Silent fail or redirect?
+                    // logout();
+                    return;
+                }
+
+                const data = await res.json();
+
+                const tbody = document.getElementById('reportTableBody');
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted)">No records found for this date</td></tr>';
+                    return;
+                }
+
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row["Registration No"]}</td>
+                        <td>${row["Name"]}</td>
+                        <td>${row["Dept"]}</td>
+                        <td>${row["Date"]}</td>
+                        <td>${row["Time"]}</td>
+                        <td><span style="padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); font-size: 0.8rem;">${row["Method"]}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function downloadReport() {
+            const date = document.getElementById('reportDate').value;
+            window.location.href = `${API_URL}/reports/download?date_str=${date}`;
+        }
+    </script>
+</body>
+
+</html>

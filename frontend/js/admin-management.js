@@ -40,6 +40,11 @@ async function loadAdmins() {
                                 </svg>
                             </button>
                         ` : ''}
+                        <button class="btn-icon btn-danger" onclick="deleteAdmin('${admin.Username}')" title="Delete Permanently" style="color: #ef4444;">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="currentColor"/>
+                            </svg>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -153,6 +158,35 @@ async function deactivateAdmin(username) {
     } catch (error) {
         console.error('Error deactivating admin:', error);
         enhancedModal.showError('Error', 'Network error while deactivating admin');
+    }
+}
+
+async function deleteAdmin(username) {
+    if (!confirm(`Are you sure you want to PERMANENTLY DELETE admin "${username}"?\nThis action cannot be undone.`)) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/manage/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': sessionToken
+            },
+            body: JSON.stringify({
+                username: username
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            enhancedModal.showSuccess('Admin Deleted', `${username} has been permanently deleted.`);
+            loadAdmins();
+        } else {
+            enhancedModal.showError('Error', data.message || 'Failed to delete admin');
+        }
+    } catch (error) {
+        console.error('Error deleting admin:', error);
+        enhancedModal.showError('Error', 'Network error while deleting admin');
     }
 }
 

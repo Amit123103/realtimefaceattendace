@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Student Registration</h1>
+            <nav>
+                <a href="index.html">Dashboard</a>
+                <a href="register.html" class="active">Register Student</a>
+                <a href="scan.html">Mark Attendance</a>
+                <a href="admin.html">Admin & Reports</a>
+            </nav>
+        </header>
+
+        <main class="grid" style="grid-template-columns: 1fr 1fr;">
+            <!-- Form Section -->
+            <div class="card">
+                <form id="regForm">
+                    <div class="form-group">
+                        <label>Registration Number</label>
+                        <input type="text" name="registration_number" required placeholder="e.g. STD2024001">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" required placeholder="e.g. John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select name="department" required>
+                            <option value="CS">Computer Science</option>
+                            <option value="IT">Information Technology</option>
+                            <option value="ECE">Electronics</option>
+                            <option value="MECH">Mechanical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select name="year" required>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Face Image</label>
+                        <input type="file" id="fileUpload" accept="image/*" style="display:none">
+                        <button type="button" class="btn btn-secondary" style="width:100%"
+                            onclick="document.getElementById('fileUpload').click()">Upload Photo Instead</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Complete
+                        Registration</button>
+                </form>
+                <div id="status" style="margin-top: 1rem; text-align: center;"></div>
+            </div>
+
+            <!-- Prevew/Camera Section -->
+            <div class="card" style="display: flex; flex-direction: column; align-items: center;">
+                <div class="camera-container">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <button type="button" id="startCamBtn" class="btn btn-secondary">Start Camera</button>
+                    <button type="button" id="captureBtn" class="btn btn-primary">Capture Face</button>
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted)">
+                    Ensure good lighting and only one person in frame.
+                </p>
+                <!-- Preview Captured Image -->
+                <img id="previewImg"
+                    style="max-width: 200px; margin-top: 1rem; border-radius: 0.5rem; display: none; border: 2px solid var(--primary);">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = "/api";
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const previewImg = document.getElementById('previewImg');
+        let capturedBlob = null;
+
+        // Camera Logic
+        document.getElementById('startCamBtn').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                alert("Cannot access camera");
+            }
+        });
+
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            canvas.toBlob(blob => {
+                capturedBlob = blob;
+                previewImg.src = URL.createObjectURL(blob);
+                previewImg.style.display = 'block';
+            }, 'image/jpeg');
+        });
+
+        // File Upload Logic
+        document.getElementById('fileUpload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                capturedBlob = file;
+                previewImg.src = URL.createObjectURL(file);
+                previewImg.style.display = 'block';
+            }
+        });
+
+        // Submit Logic
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusDiv = document.getElementById('status');
+
+            if (!capturedBlob) {
+                statusDiv.innerHTML = '<span style="color:var(--error)">Please capture or upload a face image first!</span>';
+                return;
+            }
+
+            statusDiv.innerHTML = 'Processing...';
+
+            const formData = new FormData(e.target);
+            formData.append('image', capturedBlob);
+
+            try {
+                const res = await fetch(`${API_URL}/students/register`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    statusDiv.innerHTML = `<span style="color:var(--success)">${data.message}! Redirecting...</span>`;
+                    setTimeout(() => window.location.href = `index.html`, 2000);
+                } else {
+                    statusDiv.innerHTML = `<span style="color:var(--error)">${data.detail}</span>`;
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<span style="color:var(--error)">Server Error: ${err.message}</span>`;
+            }
+        });
+    </script>
+</body>
+
+</html>

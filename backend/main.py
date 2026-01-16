@@ -10,6 +10,7 @@ from datetime import datetime, date
 from pathlib import Path
 import json
 import secrets
+import io
 
 from database import engine, get_db, Base
 from models import Student, Attendance, Admin
